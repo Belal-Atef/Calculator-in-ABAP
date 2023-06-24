@@ -1,0 +1,57 @@
+REPORT Z_CALCULATOR.
+
+PARAMETERS: p_input1 TYPE int2,
+            p_input2 TYPE int2.
+
+DATA: lv_output TYPE int2,
+      lv_flag   TYPE int1 VALUE 0.
+
+SELECTION-SCREEN: BEGIN OF SCREEN 500 TITLE TEXT-001,
+                  PUSHBUTTON 10(10) add USER-COMMAND add_button,
+                  PUSHBUTTON 25(10) sub USER-COMMAND subtract_button,
+                  PUSHBUTTON 40(10) mul USER-COMMAND multiply_button,
+                  PUSHBUTTON 55(10) div USER-COMMAND divide_button,
+END OF SCREEN 500.
+
+INITIALIZATION.
+  add = 'Add'.
+  sub = 'Subtract'.
+  mul = 'Multiply'.
+  div = 'Division'.
+
+AT SELECTION-SCREEN.
+  CASE sy-ucomm.
+    WHEN 'ADD_BUTTON'.
+      lv_flag = 1.
+      lv_output = p_input1 + p_input2.
+
+    WHEN 'SUBTRACT_BUTTON'.
+      lv_flag = 1.
+      lv_output = p_input1 - p_input2.
+
+    WHEN 'DIVIDE_BUTTON'.
+      IF p_input2 <> 0.
+        lv_flag = 1.
+        lv_output = p_input1 / p_input2.
+      ELSE.
+        lv_flag = 2.
+      ENDIF.
+
+    WHEN 'MULTIPLY_BUTTON'.
+      lv_flag = 1.
+      lv_output = p_input1 * p_input2.
+  ENDCASE.
+
+START-OF-SELECTION.
+  IF p_input1 IS NOT INITIAL OR p_input2 IS NOT INITIAL.
+    CALL SELECTION-SCREEN '500' STARTING AT 10 10.
+    IF lv_flag = 1.
+      WRITE: lv_output.
+    ELSEIF lv_flag = 2.
+      WRITE: 'Cannot divide a number by 0'.
+    ELSEIF lv_flag = 0.
+      MESSAGE 'Press any button to perform an operation!' TYPE 'I'.
+    ENDIF.
+  ELSE.
+    MESSAGE 'Please provide both inputs to proceed!' TYPE 'I'.
+  ENDIF.
